@@ -64,7 +64,7 @@ function ProductsPage() {
       const mappedSuggestions = Array.isArray(data.items)
         ? data.items.map((item) => ({
             id: item.original_product_id,
-            title: item.Title_EN,
+            title: item.suggested_product_title,
             image: item.original_main_image_url,
             desc: item.original_status_comment,
             status: item.original_status,

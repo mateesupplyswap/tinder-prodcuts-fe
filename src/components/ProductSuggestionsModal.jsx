@@ -9,16 +9,10 @@ import {
   Card,
   CardContent,
   CardMedia,
-  CardActions,
   Grid,
-  Stack,
   CircularProgress,
   Alert,
-  IconButton,
 } from "@mui/material";
-import Rating from "@mui/material/Rating";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { useNavigate } from "react-router-dom";
 
 const placeholderImg = "https://via.placeholder.com/80x80.png?text=No+Photo";
@@ -30,38 +24,17 @@ const ProductSuggestionsModal = ({
   suggestions,
   loading,
   error,
-  onAccept,
-  onReject,
 }) => {
   const navigate = useNavigate();
-
-  const handleAccept = useCallback(
-    (suggestion) => {
-      console.log("Accepting suggestion:", suggestion);
-      onAccept?.(suggestion);
-    },
-    [onAccept]
-  );
-
-  const handleReject = useCallback(
-    (suggestion) => {
-      console.log("Rejecting suggestion:", suggestion);
-      onReject?.(suggestion);
-    },
-    [onReject]
-  );
+  console.log(suggestions);
+  const originalId = mainProduct?.originalProductId;
 
   const handleCardClick = useCallback(
-    (idx) => {
-      navigate("/swipe", {
-        state: {
-          suggestions,
-          startIndex: idx,
-        },
-      });
+    (suggestion) => {
+      navigate(`/product/${suggestion.suggestedProductId}/${originalId}`);
       onClose();
     },
-    [navigate, suggestions, onClose]
+    [navigate, onClose, originalId]
   );
 
   return (
@@ -102,15 +75,14 @@ const ProductSuggestionsModal = ({
               {mainProduct?.title ?? "-"}
             </Typography>
             <Typography fontSize={15} color="text.secondary" mb={0.5}>
-              $
-              {mainProduct?.price !== undefined
-                ? mainProduct.price.toFixed(2)
-                : "--"}{" "}
-              | {mainProduct?.rating ?? "--"}★ ({mainProduct?.reviews ?? "--"}{" "}
-              reviews)
+              {mainProduct?.status ? `Status: ${mainProduct.status}` : ""}
+              {mainProduct?.desc ? ` | ${mainProduct.desc}` : ""}
             </Typography>
             <Typography fontSize={15} color="text.secondary">
-              {mainProduct?.desc ?? ""}
+              Last Check:{" "}
+              {mainProduct?.lastCheckDate
+                ? new Date(mainProduct.lastCheckDate).toLocaleDateString()
+                : "N/A"}
             </Typography>
           </Box>
         </Box>
@@ -136,15 +108,35 @@ const ProductSuggestionsModal = ({
             No suggestions available for this product.
           </Alert>
         ) : (
-          <Grid container spacing={2} mb={2}>
+          <Grid
+            container
+            spacing={2}
+            mb={2}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+              },
+              gap: 2,
+            }}
+          >
             {suggestions.map((s, idx) => (
-              <Grid item xs={12} md={4} key={`${s.id}-${idx}`}>
+              <Grid
+                item
+                key={`${s.id}-${idx}`}
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                }}
+              >
                 <Card
                   sx={{
                     p: 2,
                     borderRadius: 2,
                     boxShadow: 1,
-                    height: "100%",
+                    width: "100%",
                     display: "flex",
                     flexDirection: "column",
                     transition: "transform 0.2s",
@@ -169,79 +161,35 @@ const ProductSuggestionsModal = ({
                         mb: 1,
                         cursor: "pointer",
                       }}
-                      onClick={() => handleCardClick(idx)}
+                      onClick={() => handleCardClick(s)}
                     />
-                    <CardContent sx={{ p: 0, textAlign: "center" }}>
-                      <Typography
-                        fontWeight={700}
-                        fontSize={15}
-                        mb={0.5}
-                        sx={{ cursor: "pointer" }}
-                        onClick={() => handleCardClick(idx)}
-                      >
+                    <CardContent
+                      sx={{ p: 0, textAlign: "center", cursor: "pointer" }}
+                      onClick={() => handleCardClick(s)}
+                    >
+                      <Typography fontWeight={700} fontSize={15} mb={0.5}>
                         {s.title}
                       </Typography>
                       <Typography fontSize={14} color="text.secondary" mb={0.5}>
-                        ${s.price.toFixed(2)} | {s.rating}★ ({s.reviews}{" "}
-                        reviews)
+                        Status: {s.status || "N/A"}
+                        {s.desc ? ` | ${s.desc}` : ""}
                       </Typography>
-                      {s.desc && (
+                      <Typography fontSize={13} color="text.secondary">
+                        Last Check:{" "}
+                        {s.lastCheckDate
+                          ? new Date(s.lastCheckDate).toLocaleDateString()
+                          : "N/A"}
+                      </Typography>
+                      {s.sniperRejectionReason && (
                         <Typography
                           fontSize={13}
-                          color="text.secondary"
-                          sx={{
-                            display: "-webkit-box",
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: "vertical",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            mt: 0.5,
-                          }}
+                          color="error"
+                          sx={{ mt: 0.5 }}
                         >
-                          {s.desc}
+                          Rejection: {s.sniperRejectionReason}
                         </Typography>
                       )}
                     </CardContent>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      gap: 2,
-                      mt: 2,
-                      pt: 1,
-                      borderTop: "1px solid",
-                      borderColor: "divider",
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      color="success"
-                      startIcon={<CheckCircleIcon />}
-                      onClick={() => handleAccept(s)}
-                      size="small"
-                      sx={{
-                        minWidth: 100,
-                        textTransform: "none",
-                        fontWeight: 500,
-                      }}
-                    >
-                      Accept
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      startIcon={<CancelIcon />}
-                      onClick={() => handleReject(s)}
-                      size="small"
-                      sx={{
-                        minWidth: 100,
-                        textTransform: "none",
-                        fontWeight: 500,
-                      }}
-                    >
-                      Reject
-                    </Button>
                   </Box>
                 </Card>
               </Grid>
