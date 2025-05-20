@@ -158,19 +158,7 @@ function SuggestionSwipePage() {
               <Typography fontWeight={700} fontSize={20} mb={0.5}>
                 {suggestion.title}
               </Typography>
-              <Box display="flex" alignItems="center" mb={1}>
-                {suggestion.oldPrice && (
-                  <Typography
-                    color="text.secondary"
-                    sx={{ textDecoration: "line-through" }}
-                  >
-                    ${suggestion.oldPrice}
-                  </Typography>
-                )}
-                <Typography sx={priceStyle}>
-                  ${suggestion.price.toFixed(2)}
-                </Typography>
-              </Box>
+
               <Typography color="text.secondary" fontSize={16} mb={1}>
                 {suggestion.desc}
               </Typography>

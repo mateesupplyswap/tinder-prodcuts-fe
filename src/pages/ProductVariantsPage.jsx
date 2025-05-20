@@ -36,36 +36,26 @@ function ProductVariantsPage() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // If we have a suggestedProductId, use that as the main product
-        const targetProductId = suggestedProductId || productId;
-
-        // Fetch main product details
-        const mainProductResponse = await fetch(
-          `${API_BASE_URL}/api/products/new/${targetProductId}`
-        );
-        if (!mainProductResponse.ok) {
-          throw new Error("Failed to fetch main product");
-        }
-        const mainProductData = await mainProductResponse.json();
-        if (mainProductData.items && mainProductData.items.length > 0) {
-          setMainProduct(mainProductData.items[0]);
-        }
-
-        // Fetch variants using the original productId
-        const variantsResponse = await fetch(
+        const response = await fetch(
           `${API_BASE_URL}/api/products/new/${productId}`
         );
-        if (!variantsResponse.ok) {
-          throw new Error("Failed to fetch product variants");
+        if (!response.ok) {
+          throw new Error("Failed to fetch product data");
         }
-        const variantsData = await variantsResponse.json();
-        // Extract the items array from the response
-        const variants = variantsData.items || [];
-        setVariants(variants);
+        const data = await response.json();
+        const items = data.items || [];
+
+        // Set the first item as main product if available
+        if (items.length > 0) {
+          setMainProduct(items[0]);
+        }
+
+        // Set all items as variants
+        setVariants(items);
 
         // Initialize variant statuses
         const initialStatuses = {};
-        variants.forEach((variant) => {
+        items.forEach((variant) => {
           const statusKey = `${variant.product_id}-${variant.sku_attr}`;
           initialStatuses[statusKey] = "pending";
         });
@@ -80,7 +70,7 @@ function ProductVariantsPage() {
     if (productId) {
       fetchData();
     }
-  }, [productId, suggestedProductId]);
+  }, [productId]);
 
   const handleBack = () => {
     navigate(-1);
@@ -90,18 +80,15 @@ function ProductVariantsPage() {
     try {
       const statusKey = `${variantId}-${skuAttr}`;
       setAcceptingId(variantId);
-      const response = await fetch(
-        `${API_BASE_URL}/api/products/update`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            original_product_id: parseInt(suggestedProductId),
-          }),
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/api/products/update`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          original_product_id: parseInt(suggestedProductId),
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to accept product");

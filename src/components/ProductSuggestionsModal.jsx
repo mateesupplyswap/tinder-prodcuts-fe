@@ -149,7 +149,7 @@ const ProductSuggestionsModal = ({
                   <Box sx={{ flex: 1 }}>
                     <CardMedia
                       component="img"
-                      image={s.image || placeholderImg}
+                      image={s.suggestedMainImageUrl || placeholderImg}
                       alt={s.title}
                       sx={{
                         width: 64,
@@ -170,25 +170,6 @@ const ProductSuggestionsModal = ({
                       <Typography fontWeight={700} fontSize={15} mb={0.5}>
                         {s.title}
                       </Typography>
-                      <Typography fontSize={14} color="text.secondary" mb={0.5}>
-                        Status: {s.status || "N/A"}
-                        {s.desc ? ` | ${s.desc}` : ""}
-                      </Typography>
-                      <Typography fontSize={13} color="text.secondary">
-                        Last Check:{" "}
-                        {s.lastCheckDate
-                          ? new Date(s.lastCheckDate).toLocaleDateString()
-                          : "N/A"}
-                      </Typography>
-                      {s.sniperRejectionReason && (
-                        <Typography
-                          fontSize={13}
-                          color="error"
-                          sx={{ mt: 0.5 }}
-                        >
-                          Rejection: {s.sniperRejectionReason}
-                        </Typography>
-                      )}
                     </CardContent>
                   </Box>
                 </Card>
