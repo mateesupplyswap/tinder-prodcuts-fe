@@ -186,7 +186,10 @@ const ProductSuggestionsModal = ({
                           color="error"
                           sx={{ mt: 0.5 }}
                         >
-                          Rejection: {s.sniperRejectionReason}
+                          Rejection:{" "}
+                          {s.sniperRejectionReason === "Empty Filtration Output"
+                            ? "Rejected because of product reviews or ratings"
+                            : s.sniperRejectionReason}
                         </Typography>
                       )}
                     </CardContent>
