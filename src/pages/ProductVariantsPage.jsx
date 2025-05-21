@@ -204,7 +204,11 @@ function ProductVariantsPage() {
                 >
                   <CardMedia
                     component="img"
-                    image={variant.main_image_url || placeholderImg}
+                    image={
+                      variant.variant_image_url ||
+                      variant.main_image_url ||
+                      placeholderImg
+                    }
                     alt={variant.product_title}
                     sx={{
                       width: "100%",
@@ -249,6 +253,66 @@ function ProductVariantsPage() {
                       {parseFloat(variant.price).toFixed(2)}{" "}
                       {variant.currency_code}
                     </Typography>
+
+                    {/* Stock and Rating Info */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 1,
+                        mb: 1,
+                      }}
+                    >
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Stock:
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color={
+                            variant.available_stock > 0
+                              ? "success.main"
+                              : "error.main"
+                          }
+                          fontWeight={500}
+                        >
+                          {variant.available_stock || 0} units
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Rating:
+                        </Typography>
+                        <Typography variant="body2" fontWeight={500}>
+                          {variant.avg_reviews_rating
+                            ? variant.avg_reviews_rating.toFixed(1)
+                            : "N/A"}
+                          {variant.avg_reviews_rating && " ★"}
+                        </Typography>
+                        {variant.total_reviews > 0 && (
+                          <Typography variant="body2" color="text.secondary">
+                            ({variant.total_reviews} reviews)
+                          </Typography>
+                        )}
+                      </Box>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Sold:
+                        </Typography>
+                        <Typography variant="body2" fontWeight={500}>
+                          {variant.total_sold || 0} units
+                        </Typography>
+                      </Box>
+                    </Box>
+
                     <Typography
                       variant="body2"
                       color="text.secondary"

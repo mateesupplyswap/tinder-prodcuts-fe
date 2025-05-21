@@ -130,6 +130,21 @@ const ProductCard = memo(({ product, onViewSuggestions }) => {
                 {formattedPrice}
               </Typography>
             )}
+            {product.originalProductId && (
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: "0.75rem",
+                  color: "#757575",
+                  bgcolor: "#f5f5f5",
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: 1,
+                }}
+              >
+                ID: {product.originalProductId}
+              </Typography>
+            )}
             {product.ean && (
               <Typography
                 variant="caption"
