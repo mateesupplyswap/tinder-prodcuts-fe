@@ -377,14 +377,13 @@ function ProductVariantsPage() {
                         <Typography variant="body2" color="text.secondary">
                           Status:
                         </Typography>
-                        {variant.sniper_rejection_reason && (
-                          <Typography fontSize={13} color="error">
-                            {variant.sniper_rejection_reason ===
+                        <Typography fontSize={13} color="error">
+                          {variant.filteration_comment ||
+                            (variant.sniper_rejection_reason ===
                             "Empty Filtration Output"
                               ? "Rejected"
-                              : variant.sniper_rejection_reason}
-                          </Typography>
-                        )}
+                              : variant.sniper_rejection_reason)}
+                        </Typography>
                       </Box>
                     </Box>
 
