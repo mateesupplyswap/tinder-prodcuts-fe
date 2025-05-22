@@ -381,7 +381,7 @@ function ProductVariantsPage() {
                           <Typography fontSize={13} color="error">
                             {variant.sniper_rejection_reason ===
                             "Empty Filtration Output"
-                              ? "Rejected because of product reviews or ratings"
+                              ? "Rejected"
                               : variant.sniper_rejection_reason}
                           </Typography>
                         )}
