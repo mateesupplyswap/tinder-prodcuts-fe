@@ -7,14 +7,21 @@ import ProductVariantsPage from "./pages/ProductVariantsPage";
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<ProductsPage />} />
-        <Route path="/swipe" element={<SuggestionSwipePage />} />
-        <Route
-          path="/product/:productId/:suggestedProductId?"
-          element={<ProductVariantsPage />}
-        />
-      </Routes>
+      <div
+        style={{
+          minWidth: "1500px",
+         
+        }}
+      >
+        <Routes>
+          <Route path="/" element={<ProductsPage />} />
+          <Route path="/swipe" element={<SuggestionSwipePage />} />
+          <Route
+            path="/product/:productId/:suggestedProductId?"
+            element={<ProductVariantsPage />}
+          />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }

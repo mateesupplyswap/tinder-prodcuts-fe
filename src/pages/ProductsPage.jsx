@@ -202,8 +202,6 @@ function ProductsPage() {
       sx={{
         bgcolor: "#f7f8fa",
         minHeight: "100vh",
-        width: "100%",
-        maxWidth: "100%",
         overflowX: "hidden",
         px: { xs: 2, md: 4 },
         py: 4,

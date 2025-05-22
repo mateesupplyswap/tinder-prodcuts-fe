@@ -12,6 +12,7 @@ import {
   Button,
   Divider,
   ButtonGroup,
+  Chip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -19,13 +20,19 @@ import CancelIcon from "@mui/icons-material/Cancel";
 
 const API_BASE_URL =
   "https://tinder-products-flask-server-364851446262.europe-west4.run.app";
-const placeholderImg = "https://via.placeholder.com/80x80.png?text=No+Photo";
+
+// Add this function before the ProductVariantsPage component
+const getImageUrl = (variant) => {
+  const imageUrl = variant.main_image_url;
+};
 
 function ProductVariantsPage() {
   const { productId, suggestedProductId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [variants, setVariants] = useState([]);
+  const [filteredVariants, setFilteredVariants] = useState([]);
+  const [filter, setFilter] = useState("all");
   const [mainProduct, setMainProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,6 +59,7 @@ function ProductVariantsPage() {
 
         // Set all items as variants
         setVariants(items);
+        setFilteredVariants(items);
 
         // Initialize variant statuses
         const initialStatuses = {};
@@ -71,6 +79,19 @@ function ProductVariantsPage() {
       fetchData();
     }
   }, [productId]);
+
+  // Update filter effect
+  useEffect(() => {
+    if (filter === "all") {
+      setFilteredVariants(variants);
+    } else if (filter === "filtered") {
+      setFilteredVariants(
+        variants.filter(
+          (v) => v.sniper_rejection_reason === "Filtered Successfully"
+        )
+      );
+    }
+  }, [filter, variants]);
 
   const handleBack = () => {
     navigate(-1);
@@ -143,10 +164,40 @@ function ProductVariantsPage() {
 
       <Divider sx={{ mb: 4 }} />
 
-      {/* Variants Section */}
-      <Typography variant="h6" fontWeight={600} mb={2}>
-        Available Variants
-      </Typography>
+      {/* Variants Section with Filter */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h6" fontWeight={600} mb={2}>
+          Available Variants
+        </Typography>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Chip
+            label="All Variants"
+            onClick={() => setFilter("all")}
+            color={filter === "all" ? "primary" : "default"}
+            variant={filter === "all" ? "filled" : "outlined"}
+            sx={{
+              fontWeight: filter === "all" ? 600 : 400,
+              "&:hover": {
+                backgroundColor:
+                  filter === "all" ? "primary.main" : "action.hover",
+              },
+            }}
+          />
+          <Chip
+            label="Filtered Successfully"
+            onClick={() => setFilter("filtered")}
+            color={filter === "filtered" ? "primary" : "default"}
+            variant={filter === "filtered" ? "filled" : "outlined"}
+            sx={{
+              fontWeight: filter === "filtered" ? 600 : 400,
+              "&:hover": {
+                backgroundColor:
+                  filter === "filtered" ? "primary.main" : "action.hover",
+              },
+            }}
+          />
+        </Box>
+      </Box>
 
       {/* Content */}
       {loading ? (
@@ -157,9 +208,9 @@ function ProductVariantsPage() {
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
-      ) : variants.length === 0 ? (
+      ) : filteredVariants.length === 0 ? (
         <Alert severity="info" sx={{ mb: 2 }}>
-          No variants available for this product.
+          No variants available for the selected filter.
         </Alert>
       ) : (
         <Grid
@@ -175,7 +226,7 @@ function ProductVariantsPage() {
             gap: 2,
           }}
         >
-          {variants.map((variant, idx) => {
+          {filteredVariants.map((variant, idx) => {
             const statusKey = `${variant.product_id}-${variant.sku_attr}`;
             const currentStatus = variantStatus[statusKey] || "pending";
             return (
@@ -197,7 +248,8 @@ function ProductVariantsPage() {
                     flexDirection: "column",
                     transition: "transform 0.2s",
                     "&:hover": {
-                      transform: "translateY(-4px)",
+                      // Remove or comment out the transform
+                      // transform: "translateY(-4px)",
                       boxShadow: 2,
                     },
                   }}
@@ -205,11 +257,11 @@ function ProductVariantsPage() {
                   <CardMedia
                     component="img"
                     image={
-                      variant.variant_image_url ||
-                      variant.main_image_url ||
-                      placeholderImg
+                      variant.variant_image_url
+                        ? variant.variant_image_url
+                        : variant.main_image_url
                     }
-                    alt={variant.product_title}
+                    alt={variant.product_title || "Product image"}
                     sx={{
                       width: "100%",
                       height: 200,
@@ -218,8 +270,15 @@ function ProductVariantsPage() {
                       objectFit: "contain",
                       mb: 2,
                       p: 2,
+                      transition: "none",
                     }}
                     onError={(e) => {
+                      console.error("Image failed to load:", {
+                        variantImage: variant.variant_image_url,
+                        mainImage: variant.main_image_url,
+                        productId: variant.product_id,
+                        sku: variant.sku_attr,
+                      });
                       e.target.src = placeholderImg;
                     }}
                   />
@@ -310,6 +369,22 @@ function ProductVariantsPage() {
                         <Typography variant="body2" fontWeight={500}>
                           {variant.total_sold || 0} units
                         </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Status:
+                        </Typography>
+                        {variant.sniper_rejection_reason && (
+                          <Typography fontSize={13} color="error">
+                            {variant.sniper_rejection_reason ===
+                            "Empty Filtration Output"
+                              ? "Rejected because of product reviews or ratings"
+                              : variant.sniper_rejection_reason}
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
 
